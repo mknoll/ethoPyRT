@@ -1,0 +1,10 @@
+LICENSE.txt
+README.md
+setup.cfg
+setup.py
+ethoPy/example.py
+ethoPy.egg-info/PKG-INFO
+ethoPy.egg-info/SOURCES.txt
+ethoPy.egg-info/dependency_links.txt
+ethoPy.egg-info/requires.txt
+ethoPy.egg-info/top_level.txt

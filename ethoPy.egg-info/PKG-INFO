@@ -1,0 +1,30 @@
+Metadata-Version: 2.4
+Name: ethoPy
+Version: 0.1
+Summary: Helper function for analysis of Varian ETHOS data
+Home-page: https://github.com/mknoll/ethoPy
+Download-URL: https://github.com/mknoll/ethoPy/archive/refs/tags/v_01.tar.gz
+Author: Maximilian Knoll
+Author-email: m.knoll@dkfz.de
+License: MIT
+Keywords: Radiotherapy,ETHOS
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: Topic :: Software Development :: Build Tools
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.11
+License-File: LICENSE.txt
+Requires-Dist: nibabel
+Requires-Dist: SimpleITK
+Requires-Dist: dcmrtstruct2nii
+Requires-Dist: logging
+Dynamic: author
+Dynamic: author-email
+Dynamic: classifier
+Dynamic: download-url
+Dynamic: home-page
+Dynamic: keywords
+Dynamic: license
+Dynamic: license-file
+Dynamic: requires-dist
+Dynamic: summary
