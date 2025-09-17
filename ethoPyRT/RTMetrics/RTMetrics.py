@@ -698,14 +698,18 @@ class RTMetrics:
                 self.debug.info("Error")
 
 
-    def calcMetrics(self, dose=[0.2, 0.5, 0.95, 0.99], funs=['max', 'mean', 'xx'], col=2):
+    def calcMetrics(self, 
+                    dose=[0.2, 0.5, 0.95, 0.99], 
+                    funs=['max', 'mean', 'xx'], 
+                    dose_vals=[5, 10, 20,30,40],
+                    col=2):
         frames = self.frames
         metrics = self.metrics
         names=  self.names
         targets= self.targets
     
         coll = []
-        ### doses 
+        ### doses  -> Dx values
         for do in dose:
             xx = [x.index.values[x['ADAPTED_FROM'] <= do] for x in frames]
             xx_adapted = [x[0] if len(x) > 0  else np.NAN for x in xx  ]
@@ -730,7 +734,29 @@ class RTMetrics:
             dfXX['metr'] = "D"+ str(do*100)
             coll.append(dfXX)
     
+        ### Vx values
+        for d in dose_vals:
+            # Für jeden Frame: den Volumenanteil bestimmen, der mindestens d Gy bekommt
+            vx_adapted = [x['ADAPTED_FROM'][x['ADAPTED_FROM'] >= d].index.min() if (x['ADAPTED_FROM'] >= d).any() else np.nan for x in frames]
+            vx_treated = [x['TREATED_PLAN'][x['TREATED_PLAN'] >= d].index.min() if (x['TREATED_PLAN'] >= d).any() else np.nan for x in frames]
+            vx_reference = [x['REFERENCE_PLAN'][x['REFERENCE_PLAN'] >= d].index.min() if (x['REFERENCE_PLAN'] >= d).any() else np.nan for x in frames]
+
+            sid = [n.split("_")[1] for n in names]
+
+            dfXX = pd.DataFrame({
+            'sessionID': np.concatenate([sid, sid, sid]),
+            'target': np.concatenate([targets, targets, targets]),
+            'val': np.concatenate([vx_adapted, vx_treated, vx_reference]) / 100,  # in Anteil statt %
+            'type': np.concatenate([
+                ["adapted_from"]*len(vx_adapted),
+                ["treated_plan"]*len(vx_treated),
+                ["reference_plan"]*len(vx_reference)
+                ])
+            })
+            dfXX['metr'] = f"V{int(d)}"
+            coll.append(dfXX)
         
+
         ### metrics max, mean, vol
         dfM_CC = None
         for fun in funs:
