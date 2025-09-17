@@ -736,26 +736,28 @@ class RTMetrics:
     
         ### Vx values
         for d in dose_vals:
+            dbak = d
+            d=int(d*10000/int(rtm.fractions)) ##TODO!
             # Für jeden Frame: den Volumenanteil bestimmen, der mindestens d Gy bekommt
-            vx_adapted = [x['ADAPTED_FROM'][x['ADAPTED_FROM'] >= d].index.min() if (x['ADAPTED_FROM'] >= d).any() else np.nan for x in frames]
-            vx_treated = [x['TREATED_PLAN'][x['TREATED_PLAN'] >= d].index.min() if (x['TREATED_PLAN'] >= d).any() else np.nan for x in frames]
-            vx_reference = [x['REFERENCE_PLAN'][x['REFERENCE_PLAN'] >= d].index.min() if (x['REFERENCE_PLAN'] >= d).any() else np.nan for x in frames]
+            vx_adapted = [x['ADAPTED_FROM'][x.index.values >= d].values[0] for x in frames]
+            vx_treated = [x['TREATED_PLAN'][x.index.values >= d].values[0] for x in frames]
+            vx_reference = [x['REFERENCE_PLAN'][x.index.values >= d].values[0] for x in frames]
 
             sid = [n.split("_")[1] for n in names]
 
             dfXX = pd.DataFrame({
             'sessionID': np.concatenate([sid, sid, sid]),
             'target': np.concatenate([targets, targets, targets]),
-            'val': np.concatenate([vx_adapted, vx_treated, vx_reference]) / 100,  # in Anteil statt %
+            'val': np.concatenate([vx_adapted, vx_treated, vx_reference]), 
             'type': np.concatenate([
                 ["adapted_from"]*len(vx_adapted),
                 ["treated_plan"]*len(vx_treated),
                 ["reference_plan"]*len(vx_reference)
                 ])
             })
-            dfXX['metr'] = f"V{int(d)}"
+            dfXX['metr'] = f"V{int(dbak)}"
             coll.append(dfXX)
-        
+
 
         ### metrics max, mean, vol
         dfM_CC = None
