@@ -738,7 +738,7 @@ class RTMetrics:
         for d in dose_vals:
             dbak = d
             #d=int(d*10000/int(rtm.fractions)) ##TODO!
-            d=int(d*10000/) ##TODO!
+            d=int(d*10000) ##TODO!
             # Für jeden Frame: den Volumenanteil bestimmen, der mindestens d Gy bekommt
             vx_adapted = [x['ADAPTED_FROM'][x.index.values >= d].values[0] for x in frames]
             vx_treated = [x['TREATED_PLAN'][x.index.values >= d].values[0] for x in frames]
