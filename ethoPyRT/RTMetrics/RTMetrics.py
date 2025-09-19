@@ -737,7 +737,8 @@ class RTMetrics:
         ### Vx values
         for d in dose_vals:
             dbak = d
-            d=int(d*10000/int(rtm.fractions)) ##TODO!
+            #d=int(d*10000/int(rtm.fractions)) ##TODO!
+            d=int(d*10000/) ##TODO!
             # Für jeden Frame: den Volumenanteil bestimmen, der mindestens d Gy bekommt
             vx_adapted = [x['ADAPTED_FROM'][x.index.values >= d].values[0] for x in frames]
             vx_treated = [x['TREATED_PLAN'][x.index.values >= d].values[0] for x in frames]
@@ -896,7 +897,6 @@ class RTMetrics:
         if targ is None:
             targ = sortedData[0]['label'].values
 
-        #print("pre for")
         for target in targ:
             self.log.debug(target)
 
@@ -937,13 +937,6 @@ class RTMetrics:
                         type0.append(sortedDataSess[i+z][1].split(":")[1])
                         type1.append(":".join(sortedDataSess[i+z][1].split(":")[0:2]))
         
-                    #adapted:ADAPTED_FROM:IM102/ADP0103,
-                    #adapted:TREATED_PLAN:IM102/ADP01R1,
-                    #scheduled:REFERENCE_PLAN:IM102/SCH0104,
-        
-                    #adapted:ADAPTED_FROM:IM107/ADP1503,
-                    #scheduled:REFERENCE_PLAN:IM107/SCH1504,
-                    #scheduled:TREATED_PLAN:IM107/SCH15Rf,
                     diff = pd.DataFrame()
                     for z in range(3):
                         diff[typee[z]] = intt[z]
