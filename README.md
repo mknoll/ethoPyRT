@@ -13,9 +13,10 @@ The pyradiomics (https://pyradiomics.readthedocs.io/en/latest/installation.html)
 This package helps analyze DICOM data exported from the Varian ETHOS system.
 The Ethos treatment interface allows per-session export of data, i.e. 
 
-<dcmpath>/<patname>/Session Export/<PID>/<TreatmentIntent>/Session_<n>
 
-where dcmpath is manually selected, <patname> is manually created and the 
+`<dcmpath>/<patname>/Session Export/<PID>/<TreatmentIntent>/Session_<n>`
+
+where dcmpath is manually selected, `<patname>` is manually created and the 
 subfolders are automatically created during export.
 
 
@@ -34,7 +35,7 @@ The ethoPyRT package provides the RTMetrics class, which is instantiated per pat
 
 dcmpath is the path where the exported data from Ethos is stored.
 basepath is a folder to store transformed intermediate data generated with ethoPyRT (i.e. nifti files, see below) and 
-can be freely selected, as well as as <analysisDir>, where results are stored.
+can be freely selected, as well as as `<analysisDir>`, where results are stored.
 
 
 ## QC & Preprocessing
@@ -53,7 +54,7 @@ and RT structures are extracted with
 
 Data is stored in 
 
-    <basepath>/<TreatmentIntent>/<PID>/Session_<n>/
+    `<basepath>/<TreatmentIntent>/<PID>/Session_<n>/`
 
 in the nifti/ and RTSTRUCT/ subfolders.
 
