@@ -4,6 +4,9 @@ The package can be installed via pip:
 
     pip install ethoPyRT
 
+In addition, dcm2niix must be installed (see https://github.com/rordenlab/dcm2niix) and the executable must be visible from the python environment. 
+
+The pyradiomics (https://pyradiomics.readthedocs.io/en/latest/installation.html) executable must also be visible.
 
 # General remarks
 
