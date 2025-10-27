@@ -434,7 +434,7 @@ class RTMetrics:
                     factor = 1
                     if normalize and not "TREATED" in type[i]:
                         factor = 1/(fract)
-                    dvh.columns = np.append(dvh.columns.values[0:3], dvh.columns.values[3:]*round(factor*float(dosesFactor[i]) *10000)) ### ACHTUNG!!! Faktor 10000
+                    dvh.columns = np.append(dvh.columns.values[0:3], dvh.columns.values[3:]*(factor*float(dosesFactor[i]) *10000)) ### ACHTUNG!!! Faktor 10000
                     
                     ### scale!
                     if False:
