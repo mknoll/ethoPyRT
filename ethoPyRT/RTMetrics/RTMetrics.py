@@ -756,7 +756,7 @@ class RTMetrics:
                 ["reference_plan"]*len(vx_reference)
                 ])
             })
-            dfXX['metr'] = f"V{int(dbak)}"
+            dfXX['metr'] = f"V{round(dbak,3)}"
             coll.append(dfXX)
 
 
