@@ -831,8 +831,8 @@ class RTMetrics:
                                 'val': np.concatenate([xx_adapted, xx_treated, xx_reference])/10000,
                                 'type': np.concatenate([["adapted_from"]*len(xx_adapted), ["treated_plan"]*len(xx_treated), ["reference_plan"]*len(xx_reference )])
                                 })
-        dfXX['metr'] = "D0.03"
-        dfXX['unit'] = "cc"
+        dfXX['metr'] = "D0.03cc"
+        dfXX['unit'] = "Gy"
         coll.append(dfXX)
         ## 
 
