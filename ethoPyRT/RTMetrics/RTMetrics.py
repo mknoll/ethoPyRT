@@ -811,12 +811,12 @@ class RTMetrics:
 
         ### D0.03cc (more robust than Dmax)
         vols = dfM_CC[dfM_CC['type'] == "adapted_from"]['val'] ### same for all palsn
-        xx = [x[0].index.values[x[0]['ADAPTED_FROM']*x[1] <=0.03 ][0] for x in zip(frames, vols)]
-        xx_adapted = [x[0] if len(x) > 0  else np.NAN for x in xx  ]
-        xx = [x[0].index.values[x[0]['TREATED_PLAN']*x[1] <=0.03 ][0] for x in zip(frames, vols)]
-        xx_treated = [x[0] if len(x) > 0  else np.NAN for x in xx  ]
-        xx = [x[0].index.values[x[0]['REFERENCE_PLAN']*x[1] <=0.03 ][0] for x in zip(frames, vols)]
-        xx_reference = [x[0] if len(x) > 0  else np.NAN for x in xx  ]
+        xx_adapted = [x[0].index.values[x[0]['ADAPTED_FROM']*x[1] <=0.03 ][0] for x in zip(frames, vols)]
+        #xx_adapted = [x[0] if len(x) > 0  else np.NAN for x in xx  ]
+        xx_treated = [x[0].index.values[x[0]['TREATED_PLAN']*x[1] <=0.03 ][0] for x in zip(frames, vols)]
+        #xx_treated = [x[0] if len(x) > 0  else np.NAN for x in xx  ]
+        xx_reference = [x[0].index.values[x[0]['REFERENCE_PLAN']*x[1] <=0.03 ][0] for x in zip(frames, vols)]
+        #xx_reference = [x[0] if len(x) > 0  else np.NAN for x in xx  ]
         dfX = pd.DataFrame({'adp': xx_adapted, 
                                'treated': xx_treated,
                                'ref': xx_reference})
