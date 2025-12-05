@@ -712,6 +712,7 @@ class RTMetrics:
     
         coll = []
         ### doses  -> Dx values
+        #### Min dose received by x% of the volume
         for do in dose:
             xx = [x.index.values[x['ADAPTED_FROM'] <= do] for x in frames]
             xx_adapted = [x[0] if len(x) > 0  else np.NAN for x in xx  ]
@@ -734,17 +735,35 @@ class RTMetrics:
                                 'type': np.concatenate([["adapted_from"]*len(xx_adapted), ["treated_plan"]*len(xx_treated), ["reference_plan"]*len(xx_reference )])
                                 })
             dfXX['metr'] = "D"+ str(do*100)
+            dfXX['unit'] = "Gy"
             coll.append(dfXX)
+
     
         ### Vx values
+        ### Volume percentage that received at least x Gy
         for d in dose_vals:
             dbak = d
             #d=int(d*10000/int(rtm.fractions)) ##TODO!
             d=int(d*10000) ##TODO!
             # Für jeden Frame: den Volumenanteil bestimmen, der mindestens d Gy bekommt
-            vx_adapted = [x['ADAPTED_FROM'][x.index.values >= d].values[0] for x in frames]
-            vx_treated = [x['TREATED_PLAN'][x.index.values >= d].values[0] for x in frames]
-            vx_reference = [x['REFERENCE_PLAN'][x.index.values >= d].values[0] for x in frames]
+            #vx_adapted = [x['ADAPTED_FROM'][x.index.values >= d].values[0] for x in frames]
+            #vx_treated = [x['TREATED_PLAN'][x.index.values >= d].values[0] for x in frames]
+            #vx_reference = [x['REFERENCE_PLAN'][x.index.values >= d].values[0] for x in frames]
+
+            # Für jeden Frame: den Volumenanteil bestimmen, der mindestens d Gy bekommt
+            vx_adapted = [
+                x['ADAPTED_FROM'][x.index.values >= d].values[0] if np.any(x.index.values >= d) else 0
+                for x in frames
+            ]
+            vx_treated = [
+                x['TREATED_PLAN'][x.index.values >= d].values[0] if np.any(x.index.values >= d) else 0
+                for x in frames
+            ]
+            vx_reference = [
+                x['REFERENCE_PLAN'][x.index.values >= d].values[0] if np.any(x.index.values >= d) else 0
+                for x in frames
+            ]
+
 
             sid = [n.split("_")[1] for n in names]
 
@@ -759,7 +778,10 @@ class RTMetrics:
                 ])
             })
             dfXX['metr'] = f"V{round(dbak,3)}"
+            dfXX['unit'] = "%/100"
             coll.append(dfXX)
+
+
 
 
         ### metrics max, mean, vol
@@ -776,13 +798,46 @@ class RTMetrics:
                                 'val': np.concatenate([metrMax_adapted, metrMax_treated, metrMax_reference])/10000,
                                 'type': np.concatenate([["adapted_from"]*len(metrMax_adapted), ["treated_plan"]*len( metrMax_treated), ["reference_plan"]*len(metrMax_reference )])
                                 })
+            unit = "Gy"
             if fun == "xx":
                 fun = "cc"
+                unit = "cc"
             dfM_Max['metr'] = fun
-            if fun == "cc":
+            dfM_Max['unit'] = unit
+            if fun == "cc": ### TODO: test 
                 dfM_CC = dfM_Max
-    
+
             coll.append(dfM_Max)
+
+        ### D0.03cc (more robust than Dmax)
+        vols = dfM_CC[dfM_CC['type'] == "adapted_from"]['val'] ### same for all palsn
+        xx = [x[0].index.values[x[0]['ADAPTED_FROM']*x[1] <=0.03 ][0] for x in zip(frames, vols)]
+        xx_adapted = [x[0] if len(x) > 0  else np.NAN for x in xx  ]
+        xx = [x[0].index.values[x[0]['TREATED_PLAN']*x[1] <=0.03 ][0] for x in zip(frames, vols)]
+        xx_treated = [x[0] if len(x) > 0  else np.NAN for x in xx  ]
+        xx = [x[0].index.values[x[0]['REFERENCE_PLAN']*x[1] <=0.03 ][0] for x in zip(frames, vols)]
+        xx_reference = [x[0] if len(x) > 0  else np.NAN for x in xx  ]
+        dfX = pd.DataFrame({'adp': xx_adapted, 
+                               'treated': xx_treated,
+                               'ref': xx_reference})
+        dfX = dfX/10000
+        dfX['session'] = names
+        dfX['sessID'] = [x.split("_")[1] for x in names]
+        dfX['target'] = targets
+            #frames[0].index.values[frames[0]['adapted'] > 0.2][0]
+        sid = [x.split("_")[1] for x in names]
+        dfXX = pd.DataFrame({'sessionID': np.concatenate([sid, sid, sid]),
+                                'target': np.concatenate([targets, targets, targets]),
+                                'val': np.concatenate([xx_adapted, xx_treated, xx_reference])/10000,
+                                'type': np.concatenate([["adapted_from"]*len(xx_adapted), ["treated_plan"]*len(xx_treated), ["reference_plan"]*len(xx_reference )])
+                                })
+        dfXX['metr'] = "D0.03"
+        dfXX['unit'] = "cc"
+        coll.append(dfXX)
+        ## 
+
+
+
         ######## save
     
         try:
