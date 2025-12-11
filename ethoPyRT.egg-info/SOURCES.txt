@@ -1,0 +1,9 @@
+LICENSE.txt
+README.md
+pyproject.toml
+setup.py
+ethoPyRT.egg-info/PKG-INFO
+ethoPyRT.egg-info/SOURCES.txt
+ethoPyRT.egg-info/dependency_links.txt
+ethoPyRT.egg-info/requires.txt
+ethoPyRT.egg-info/top_level.txt

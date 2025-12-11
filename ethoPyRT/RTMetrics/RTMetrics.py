@@ -1100,10 +1100,11 @@ class RTMetrics:
                             self.debug.info(cmd)
                             os.system(cmd)
         
+
     ######## preprcoessing
     def extractRTStruct(self, session=None):
         self.log.info("Extracting RTStruct ... ")
-        
+
         sessPath = ""
         if not session is None:
             sessPath = session
