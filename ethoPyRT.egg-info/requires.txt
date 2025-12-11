@@ -1,5 +1,0 @@
-nibabel
-numpy
-platipy
-SimpleITK
-dcmrtstruct2nii@ git+https://github.com/mknoll/dcmrtstruct2nii.git@master
