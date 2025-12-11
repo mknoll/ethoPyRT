@@ -67,6 +67,7 @@ class RTMetrics:
     totalDose = None
     fractions = None
     prescriptionTarget = None
+    intent = None ## treatment intent
 
     ### adapted or scheduled?
     adapted = 0
@@ -198,7 +199,7 @@ class RTMetrics:
     ##########
 
 
-    def __init__(self, dcmpath, basepath, pid, statusDir="../status/", analysisDir="../analysis/", allCBCT=False):
+    def __init__(self, dcmpath, basepath, pid, statusDir="../status/", analysisDir="../analysis/", allCBCT=False, intent="*"):
         ###TODO: check if files exists / pat ID exists 
         self.dcmpath = dcmpath
         self.basepath = basepath 
@@ -206,6 +207,7 @@ class RTMetrics:
         self.statusDir = statusDir
         self.analysisDir = analysisDir
         self.allCBCT = allCBCT
+        self.intent = intent
         self.debug.setLevel(logging.CRITICAL)
         self.log.setLevel(logging.INFO)
 
@@ -224,12 +226,12 @@ class RTMetrics:
         pid = self.pid
 
         tmsS = {}
-        for session in glob.glob(dcmpath + "/*/Session Export/"+ pid + "/*/*"):
+        for session in glob.glob(dcmpath + "/*/Session Export/"+ pid + "/"+self.intent+"/*"):
             print(".", end="")
             self.debug.info("SESSION: " + session)
             sess = session.split("/")[8]
             l = {}
-            for dcm in glob.glob(dcmpath + "/*/Session Export/"+ pid + "/*/" + sess + "/RTDO*"):
+            for dcm in glob.glob(dcmpath + "/*/Session Export/"+ pid + "/"+self.intent+"/" + sess + "/RTDO*"):
                 session = dcm.split("/")[8]
                 self.debug.info("file: " + dcm)
                 try:
@@ -293,7 +295,7 @@ class RTMetrics:
         
         self.log.info("Determine RTPLAN type ...")
 
-        basepath = glob.glob(self.basepath + "/*/"+self.pid+ "/")[0] ##FIXME
+        basepath = glob.glob(self.basepath + "/"+self.intent+"/"+self.pid+ "/")[0] ##FIXME
         tmsS = self.tmsS
         
         ## TODO: check len of basepath
@@ -342,7 +344,8 @@ class RTMetrics:
                                         self.debug.warning(e)
                                 except Exception as e :
                                     self.debug.warning(e)
-        self.doses = doses
+        #self.doses = doses
+        self.doses = [x.replace("//", "/") for x in doses] ### FIXME
         self.dosesFactor = dosesFactor
         self.headers = headers
         self.type = type
@@ -647,7 +650,7 @@ class RTMetrics:
         if not session is None:
             sessPath = session
     
-        dcmpath = glob.glob(self.dcmpath + "/*/Session*/" + self.pid + "/*/" + sessPath)[0] 
+        dcmpath = glob.glob(self.dcmpath + "/*/Session*/" + self.pid + "/"+ self.intent+ "/" + sessPath)[0] 
         
         rtstructs = []
         for root, dirs, files in os.walk(dcmpath, topdown=False):
@@ -1109,7 +1112,7 @@ class RTMetrics:
         if not session is None:
             sessPath = session
     
-        dcmpath = glob.glob(self.dcmpath + "/*/Session*/" + self.pid + "/*/" + sessPath)[0]  
+        dcmpath = glob.glob(self.dcmpath + "/*/Session*/" + self.pid + "/"+self.intent+"/" + sessPath)[0]  
         rtstructs = []
         for root, dirs, files in os.walk(dcmpath, topdown=False):
             for name in files:
@@ -1224,9 +1227,27 @@ class RTMetrics:
 
     def checkFiles(self):
         """
-        Check if all required RTDOSE and RTPLAN files are there ...
+        Check if all required RTDOSE and RTPLAN files are there.
+        Check fi multiple treatmetn intents exists per PID
         """
-        for session in glob.glob(self.dcmpath + "/*/Session Export/"+ self.pid + "/*/*"):
+        ## Treatment intents
+        intents = {}
+        for intent in glob.glob(self.dcmpath + "/*/Session Export/"+ self.pid + "/"+self.intent+"/"):
+            curInt  = intent.split("/")[-2]
+            self.log.info("PID: " + self.pid + " INTENT: " + curInt)
+            if self.pid in intents.keys():
+                if curInt != intents[self.pid]:
+                    self.debug.critical("MULTIPLE INTENTS: " + self.pid + " " + curInt + " / " + intents[self.pid])
+                    self.debug.critical("Please specify intent in RTMetrics constructor: RTMetrics(..., intent='')")
+                    self.log.critical("MULTIPLE INTENTS: " + self.pid + " " + curInt + " / " + intents[self.pid])
+                    self.log.critical("Please specify intent in RTMetrics constructor: RTMetrics(..., intent='')")
+                    raise
+            else:
+                intents.update({self.pid:curInt})
+
+
+        ## RTDOSE and RTPLAN
+        for session in glob.glob(self.dcmpath + "/*/Session Export/"+ self.pid + "/"+self.intent+"/*"):
             print(".", end="")
             self.debug.info("SESSION: " + session)
             #sess = session.split("/")[8]
