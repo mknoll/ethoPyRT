@@ -790,15 +790,17 @@ class RTMetrics:
         ### metrics max, mean, vol
         dfM_CC = None
         for fun in funs:
+            fact = 10000
             if fun == 'cc':
                 fun = 'xx'
+                fact = 10000
             metrMax_adapted = [x[fun][x['type'] == "ADAPTED_FROM"].values[0] for x in metrics]
             metrMax_treated = [x[fun][x['type'] == "TREATED_PLAN"].values[0] for x in metrics]
             metrMax_reference = [x[fun][x['type'] == "REFERENCE_PLAN"].values[0] for x in metrics]
             sid = [x.split("_")[1] for x in names]
             dfM_Max = pd.DataFrame({'sessionID': np.concatenate([sid, sid, sid]),
                                 'target': np.concatenate([targets, targets, targets]),
-                                'val': np.concatenate([metrMax_adapted, metrMax_treated, metrMax_reference])/10000,
+                                'val': np.concatenate([metrMax_adapted, metrMax_treated, metrMax_reference])/fact,
                                 'type': np.concatenate([["adapted_from"]*len(metrMax_adapted), ["treated_plan"]*len( metrMax_treated), ["reference_plan"]*len(metrMax_reference )])
                                 })
             unit = "Gy"
