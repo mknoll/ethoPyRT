@@ -1051,61 +1051,6 @@ class RTMetrics:
             #rtm.copyPath(fromPath, toPath, patName=patName)
         """
     
-    def calcRadiomics(self, masks=None, type='SCT'):
-        sessions = glob.glob(self.basepath + "/*/" + self.pid + "/*")
-
-        ## identify files
-        identifySCT()
-        identifyCBCT()
-        identifyDose()
-
-        for session in sessions:
-            self.log.info("Session: " + session)
-            print(session)
-            
-            ###FIXME: loop
-            if type == 'SCT':
-                ctIn = self.sct[session.split("/")[-1]][0]
-            elif type == 'CBCT':
-                ctIn = self.cbcts[session.split("/")[-1]][0]
-            elif type == 'Dtreat':
-                ctIn = self.doseTreat[session.split("/")[-1]][0]
-            elif type == 'Dsched':
-                ctIn = self.doseSched[session.split("/")[-1]][0]
-            elif type == 'Dadp':
-                ctIn = self.doseAdp[session.split("/")[-1]][0]
-            else:
-                self.log.error("Unknown type for calcRadiomics! Values: SCT, CBCT, Dtreat, Dsched, Dadp ")
-            
-            if not os.path.isfile(ctIn):
-                self.debug.error("Input CT does not exist: " + ctIn)
-            for maskFile in glob.glob(session + "/RTSTRUCT/mask_*.nii.gz"):
-                print(".", end="")
-                nm = maskFile.split("/")[-1].split("mask_")[1].replace(".nii.gz","")
-                if not masks is None:
-                    if masks.count(nm) > 0:
-                        self.debug.info(maskFile + " -> " + nm)
-                        if type == 'SCT':
-                            outFile = session + "/RTSTRUCT/feat/sct__" + nm + ".csv"
-                        elif type == 'CBCT':
-                            outFile = session + "/RTSTRUCT/feat/cbct__" + nm + ".csv"
-                        elif type == 'Dtreat':
-                            outFile = session + "/RTSTRUCT/feat/Dtreat__" + nm + ".csv"
-                        elif type == 'Dsched':
-                            outFile = session + "/RTSTRUCT/feat/Dsched__" + nm + ".csv"
-                        elif type == 'Dadp':
-                            outFile = session + "/RTSTRUCT/feat/Dadp__" + nm + ".csv"
-
-                        self.debug.info("outFile: " + outFile)
-                        if not os.path.isdir(session + "/RTSTRUCT/feat/"):
-                            os.makedirs(session + "/RTSTRUCT/feat/")
-                                             
-                        if not os.path.isfile(outFile):
-                            cmd = "pyradiomics --setting=label:255 --format csv --setting correctMask:True " + str(ctIn) + " " + str(maskFile) + " -o " + str(outFile)
-                            self.debug.info(cmd)
-                            os.system(cmd)
-        
-
     ######## preprcoessing
     def extractRTStruct(self, session=None):
         self.log.info("Extracting RTStruct ... ")
@@ -1570,4 +1515,59 @@ class RTMetrics:
             outFiles.update({file:out})
     
         return(outFiles)
+
+    def calcRadiomics(self, masks=None, type='SCT'):
+        sessions = glob.glob(self.basepath + "/*/" + self.pid + "/*")
+
+        ## identify files
+        identifySCT()
+        identifyCBCT()
+        identifyDose()
+
+        for session in sessions:
+            self.log.info("Session: " + session)
+            print(session)
+            
+            ###FIXME: loop
+            if type == 'SCT':
+                ctIn = self.sct[session.split("/")[-1]][0]
+            elif type == 'CBCT':
+                ctIn = self.cbcts[session.split("/")[-1]][0]
+            elif type == 'Dtreat':
+                ctIn = self.doseTreat[session.split("/")[-1]][0]
+            elif type == 'Dsched':
+                ctIn = self.doseSched[session.split("/")[-1]][0]
+            elif type == 'Dadp':
+                ctIn = self.doseAdp[session.split("/")[-1]][0]
+            else:
+                self.log.error("Unknown type for calcRadiomics! Values: SCT, CBCT, Dtreat, Dsched, Dadp ")
+            
+            if not os.path.isfile(ctIn):
+                self.debug.error("Input CT does not exist: " + ctIn)
+            for maskFile in glob.glob(session + "/RTSTRUCT/mask_*.nii.gz"):
+                print(".", end="")
+                nm = maskFile.split("/")[-1].split("mask_")[1].replace(".nii.gz","")
+                if not masks is None:
+                    if masks.count(nm) > 0:
+                        self.debug.info(maskFile + " -> " + nm)
+                        if type == 'SCT':
+                            outFile = session + "/RTSTRUCT/feat/sct__" + nm + ".csv"
+                        elif type == 'CBCT':
+                            outFile = session + "/RTSTRUCT/feat/cbct__" + nm + ".csv"
+                        elif type == 'Dtreat':
+                            outFile = session + "/RTSTRUCT/feat/Dtreat__" + nm + ".csv"
+                        elif type == 'Dsched':
+                            outFile = session + "/RTSTRUCT/feat/Dsched__" + nm + ".csv"
+                        elif type == 'Dadp':
+                            outFile = session + "/RTSTRUCT/feat/Dadp__" + nm + ".csv"
+
+                        self.debug.info("outFile: " + outFile)
+                        if not os.path.isdir(session + "/RTSTRUCT/feat/"):
+                            os.makedirs(session + "/RTSTRUCT/feat/")
+                                             
+                        if not os.path.isfile(outFile):
+                            cmd = "pyradiomics --setting=label:255 --format csv --setting correctMask:True " + str(ctIn) + " " + str(maskFile) + " -o " + str(outFile)
+                            self.debug.info(cmd)
+                            os.system(cmd)
+        
 
