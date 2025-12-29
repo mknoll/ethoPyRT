@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="ethoPyRT",
-    version="0.1.16",
+    version="0.1.17",
     author="Maximilian Knoll",
     author_email="m.knoll@dkfz.de",
     description="Helper function for analysis of Varian ETHOS data",
