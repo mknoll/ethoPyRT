@@ -399,12 +399,13 @@ class RTMetrics:
             
 
         
-    def calcDVH(self, normalize=False):      
+    def calcDVH(self, normalize=True, scaleToTreated=True):      
         """
         Calculate DVHs 
         
             Parameters:
                 normalize (bool): Divide the ADAPTED_FROM and REFERENCE_PLAN dose information by fractions
+                scaleToTreated (bool): Scale DVHs to TREATED_PLAN based on max values
                 
         """
         self.log.info("Calculate DVHs...")
@@ -414,10 +415,12 @@ class RTMetrics:
         doses = self.doses
         dosesFactor = self.dosesFactor
         masks = self.masks
+        #metrics = self.metrics
         type = self.type
         
         data = []
         dataSess = []
+        maxValTreatedPerSession = {}
         for i in range(len(doses)):
             print(str(i+1)+"/"+str(len(doses))+ "   ", end="\r")
             tmp = doses[i].split("/")
@@ -426,6 +429,14 @@ class RTMetrics:
             if added[w] == session:
                 labels = masks[w]
                 dose_grid = sitk.ReadImage(doses[i])
+
+                ## get max value of treated plan to scale adp and sched dvhs to
+                #metricsRef = metrics[w]
+                #metrRefVal = metricsRef[metricsRef['type'] == "TREATED_PLAN"]['max'].values[0]
+                #self.debug.info("Max value treated plan of this session: " + str(metrRefVal))
+                #self.debug.info("Max value for current plan: " + str(pd.concat(self.metrics).iloc[i,:]['max']))
+                #dvhScaleFact = pd.concat(self.metrics).iloc[i,:]['max']/metrRefVal
+
                 try:
                     dvh = calculate_dvh_for_labels(dose_grid,  labels, bin_width=10)
                     self.debug.info("Dosis factor: " + str(float(dosesFactor[i])))
@@ -438,18 +449,35 @@ class RTMetrics:
                     if normalize and not "TREATED" in type[i]:
                         factor = 1/(fract)
 
+                    ## dosis factor from dicom
+                    ## TODO: check volume!
                     dvh['mean'] = dvh['mean']*(factor*float(dosesFactor[i]) *10000) ### ACHTUNG!!! Faktor 10000
                     dvh.columns = np.append(dvh.columns.values[0:3], dvh.columns.values[3:]*(factor*float(dosesFactor[i]) *10000)) ### ACHTUNG!!! Faktor 10000
+
+                    ## scale to treated plan, based on max value in dvh
+                    if "TREATED" in type[i]:
+                        maxValTreatedPerSession.update({session[0]:np.max(dvh.columns.values[3:])})
                     
-                    ### scale!
-                    if False:
-                        fract = int(self.fractions)
-                        ed = float(self.totalDose)/fract
-                                       
                     data.append(dvh)
                     dataSess.append([session, type[i], doses[i], dosesFactor[i]])
                 except Exception as e:
                     self.debug.error(e)
+
+        ###scale dvhs to treated DVH based on max values
+        if scaleToTreated:
+            for i in range(len(data)):
+                session = dataSess[i][0][0]
+                self.debug.info("session: " + str(session))
+                self.debug.info("max value in treated plan: " + str(maxValTreatedPerSession[session]))
+                self.debug.info("max value in current plan: " + str(np.max(dvh.columns.values[3:])))
+
+                dvh = data[i]
+                scaleFact = maxValTreatedPerSession[session]/np.max(dvh.columns.values[3:])
+                self.debug.info("scale factor: " + str(scaleFact))
+
+                dvh['mean'] = dvh['mean']*scaleFact 
+                dvh.columns = np.append(dvh.columns.values[0:3], dvh.columns.values[3:]*scaleFact)
+
 
         #### SORTING
         sortedData = []
