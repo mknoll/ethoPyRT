@@ -399,13 +399,14 @@ class RTMetrics:
             
 
         
-    def calcDVH(self, normalize=True, scaleToTreated=True):      
+    def calcDVH(self, normalize=True, scaleToTreated=True, ccFactor=39.12002/10000):      
         """
         Calculate DVHs 
         
             Parameters:
                 normalize (bool): Divide the ADAPTED_FROM and REFERENCE_PLAN dose information by fractions
                 scaleToTreated (bool): Scale DVHs to TREATED_PLAN based on max values
+                ccFactor (float): Empirical factor to scale dvh cc values with to obtain ml values
                 
         """
         self.log.info("Calculate DVHs...")
@@ -451,6 +452,7 @@ class RTMetrics:
 
                     ## dosis factor from dicom
                     ## TODO: check volume!
+                    dvh['cc'] = dvh['cc']*ccFactor
                     dvh['mean'] = dvh['mean']*(factor*float(dosesFactor[i]) *10000) ### ACHTUNG!!! Faktor 10000
                     dvh.columns = np.append(dvh.columns.values[0:3], dvh.columns.values[3:]*(factor*float(dosesFactor[i]) *10000)) ### ACHTUNG!!! Faktor 10000
 
