@@ -399,13 +399,14 @@ class RTMetrics:
             
 
         
-    def calcDVH(self, normalize=True, scaleToTreated=False, ccFactor=39.12002):      
+    def calcDVH(self, normalize=True, scaleToTreated=True, scaleToTreatedCutoff=1, ccFactor=39.12002):      
         """
         Calculate DVHs 
         
             Parameters:
                 normalize (bool): Divide the ADAPTED_FROM and REFERENCE_PLAN dose information by fractions
                 scaleToTreated (bool): Scale DVHs to TREATED_PLAN based on max values
+                scaleToTreatedCutoff (float): percent in divergence of max values adp or sched to treated to apply scalingToTreated to 
                 ccFactor (float): Empirical factor to scale dvh cc values with to obtain ml values
                 
         """
@@ -477,8 +478,10 @@ class RTMetrics:
                 scaleFact = maxValTreatedPerSession[session]/np.max(dvh.columns.values[3:])
                 self.debug.info("scale factor: " + str(scaleFact))
 
-                dvh['mean'] = dvh['mean']*scaleFact 
-                dvh.columns = np.append(dvh.columns.values[0:3], dvh.columns.values[3:]*scaleFact)
+                if scaleFact > scaleToTreatedCutoff:
+                    dvh['mean'] = dvh['mean']*scaleFact 
+                    dvh.columns = np.append(dvh.columns.values[0:3], dvh.columns.values[3:]*scaleFact)
+                    self.debug.info("adjusting DVH values")
 
 
         #### SORTING
