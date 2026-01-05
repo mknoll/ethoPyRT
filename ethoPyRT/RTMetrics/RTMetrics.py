@@ -399,7 +399,7 @@ class RTMetrics:
             
 
         
-    def calcDVH(self, normalize=True, scaleToTreated=True, ccFactor=39.12002):      
+    def calcDVH(self, normalize=True, scaleToTreated=False, ccFactor=39.12002):      
         """
         Calculate DVHs 
         
