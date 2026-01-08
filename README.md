@@ -2,7 +2,7 @@
 
 The package can be installed via pip:
 
-    pip install ethoPyRT
+    pip install git+https://github.com/mknoll/ethoPyRT.git
 
 In addition, dcm2niix must be installed (see https://github.com/rordenlab/dcm2niix) and the executable must be visible from the python environment. 
 
