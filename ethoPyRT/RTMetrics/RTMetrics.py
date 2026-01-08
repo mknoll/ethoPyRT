@@ -399,7 +399,7 @@ class RTMetrics:
             
 
         
-    def calcDVH(self, normalize=True, scaleToTreated=True, scaleToTreatedCutoff=1, ccFactor=39.12002):      
+    def calcDVH(self, normalize=True, scaleToTreated=True, scaleToTreatedCutoff=1, ccFactor=39.12002/100):      
         """
         Calculate DVHs 
         
@@ -998,8 +998,9 @@ class RTMetrics:
             for j in range(len(ii)):
                 try:
                     i = ii[j][0][0]
-                    trg = self.match[target]
-        
+                    #trg = self.match[target] ##FIXME
+                    trg = target
+
                     tmpp = []
                     
                     maxs = []
