@@ -143,7 +143,7 @@ def dcmrtstruct2nii(rtstruct_file, dicom_file, output_path, structures=None, gzi
     filename_converter = FilenameConverter()
     rtreader = RtStructInputAdapter()
 
-    rtstructs = rtreader.ingest(rtstruct_file)
+    rtstructs = rtreader.ingest(rtstruct_file, True)
     dicom_image = DcmInputAdapter().ingest(dicom_file, series_id=series_id)
 
     dcm_patient_coords_to_mask = DcmPatientCoords2Mask()
