@@ -100,7 +100,7 @@ def list_rt_structs(rtstruct_file):
         raise PathDoesNotExistException(f'rtstruct path does not exist: {rtstruct_file}')
 
     rtreader = RtStructInputAdapter()
-    rtstructs = rtreader.ingest(rtstruct_file, None, True)
+    rtstructs = rtreader.ingest(rtstruct_file, '*', True)
     return [struct['name'] for struct in rtstructs]
 
 
@@ -143,7 +143,7 @@ def dcmrtstruct2nii(rtstruct_file, dicom_file, output_path, structures=None, gzi
     filename_converter = FilenameConverter()
     rtreader = RtStructInputAdapter()
 
-    rtstructs = rtreader.ingest(rtstruct_file, None)
+    rtstructs = rtreader.ingest(rtstruct_file, '*')
     dicom_image = DcmInputAdapter().ingest(dicom_file, series_id=series_id)
 
     dcm_patient_coords_to_mask = DcmPatientCoords2Mask()
