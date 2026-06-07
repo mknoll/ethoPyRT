@@ -100,7 +100,7 @@ def list_rt_structs(rtstruct_file):
         raise PathDoesNotExistException(f'rtstruct path does not exist: {rtstruct_file}')
 
     rtreader = RtStructInputAdapter()
-    rtstructs = rtreader.ingest(rtstruct_file, None)
+    rtstructs = rtreader.ingest(rtstruct_file, None, True)
     return [struct['name'] for struct in rtstructs]
 
 
