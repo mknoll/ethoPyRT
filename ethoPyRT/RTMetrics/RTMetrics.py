@@ -1016,7 +1016,13 @@ class RTMetrics:
                     maxV = 0
                     for z in range(3):
                         tmp1 = sortedData[i+z]
-                        tofind = tmp1['label'][tmp1['label'].isin(trg)].values[0]
+                        matches = tmp1['label'][tmp1['label'].isin(trg)]
+
+                        if matches.empty:
+                            self.log.info(f"None of {trg} found for target '{target}'")
+                            raise KeyError(f"missing requested mask: {target}")
+
+                        tofind = matches.values[0]
                         mn1 = tmp1.loc[tmp1['label'] == tofind]['mean'].values[0]
                         cc1 = tmp1.loc[tmp1['label'] == tofind]['cc'].values[0]
                         tmp1 = tmp1.loc[tmp1['label'] == tofind].iloc[0,4:]
