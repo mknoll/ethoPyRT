@@ -1005,7 +1005,8 @@ class RTMetrics:
                 try:
                     i = ii[j][0][0]
                     #trg = self.match[target] ##FIXME
-                    trg = target
+                    #trg = target
+                    trg = self.match.get(target, [target])
 
                     tmpp = []
                     
