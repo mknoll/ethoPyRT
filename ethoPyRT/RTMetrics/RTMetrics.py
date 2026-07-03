@@ -277,6 +277,12 @@ class RTMetrics:
             tmsS.update({sess:l})
         self.tmsS = tmsS
 
+        ## check if any dose data was found
+        if len(tmsS) == 0:
+            self.debug.critical("No dose information found!")
+            self.log.critical("No dose information found!")
+            raise ValueError('Check Data!')
+
         ### check if 3 IDs / session were identified
         for t in tmsS:
             if len(tmsS[t]) != 3:
