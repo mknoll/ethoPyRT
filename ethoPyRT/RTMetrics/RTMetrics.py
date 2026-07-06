@@ -396,14 +396,18 @@ class RTMetrics:
         self.added = added
 
         ### check if masks were added
-        for m in masks:
-            if len(m) == 0:
-                self.debug.critical("No masks added!")
-                self.log.critical("No masks added!")
-                raise
-                
-            
+        if len(masks) == 0:
+            self.debug.critical("No masks added!")
+            self.log.critical("No masks added!")
+            raise 
 
+        ## check if any session does not have a mask
+        for i in range(len(self.masks)):
+            m = masks[i]
+            if len(masks) == 0:
+                self.debug.critical("No masks added for Session " + str(added[i]) + "!")
+                self.log.critical("No masks added for Session " + str(added[i]) + "!")
+                raise
         
     def calcDVH(self, normalize=True, scaleToTreated=True, scaleToTreatedCutoff=1, ccFactor=39.12002/100):      
         """
