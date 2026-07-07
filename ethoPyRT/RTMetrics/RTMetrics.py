@@ -207,7 +207,7 @@ class RTMetrics:
         self.statusDir = statusDir
         self.analysisDir = analysisDir
         self.allCBCT = allCBCT
-        self.intent = intent
+        self.intent = intent 
         self.debug.setLevel(logging.CRITICAL)
         self.log.setLevel(logging.INFO)
 
@@ -301,7 +301,8 @@ class RTMetrics:
         
         self.log.info("Determine RTPLAN type ...")
 
-        basepath = glob.glob(self.basepath + "/"+self.intent+"/"+self.pid+ "/")[0] ##FIXME
+        #basepath = glob.glob(self.basepath + "/"+self.intent+"/"+self.pid+ "/")[0] ##FIXME ACHTUNG - hier ändert sich der intent!
+        basepath = glob.glob(self.basepath + "/"+self.intent.replace(" ", "_")+"/"+self.pid+ "/")[0] ##FIXME ACHTUNG - hier ändert sich der intent!
         tmsS = self.tmsS
         
         ## TODO: check len of basepath
