@@ -224,6 +224,7 @@ class RTMetrics:
         self.log.info("Loading doses...")
         dcmpath = self.dcmpath
         pid = self.pid
+        collfract = []
 
         tmsS = {}
         for session in glob.glob(dcmpath + "/*/Session Export/"+ pid + "/"+self.intent+"/*"):
@@ -269,13 +270,32 @@ class RTMetrics:
                         totalDose = str(dose[0x300a, 0x0010][ip][0x300a,0x0026]).split("DS: ")[1].replace("'", "")
                         self.totalDose = totalDose
                     nFract = str(dose[0x300a, 0x0070][0][0x300a, 0x0078]).split("IS: ")[1].replace("\'", "")
-                    self.fractions = nFract
+                    self.debug.info("number of fractions: " + str(nFract))
+                    collfract.append(nFract)
                     
                 except Exception as e:
                     self.debug.warning("ERROR with " + dcm)
                     self.debug.warning(e)
             tmsS.update({sess:l})
         self.tmsS = tmsS
+
+        ## number of fractions
+        ### FIXME - es können mehrere Abschnitte im Ethos Treatment intent vorkommen,
+        ### z.B. 25 + 5 Fraktionen -> unklar, wie diese im DICOM identifiziert werden können!
+        ### beeinträchtigt DVHu. DVH MEtrik Berechnung!
+        ### wenn zwei gleichgroße splits vorkommen, oder mehrere abschnitte mit 
+        ### jeweils gleicher anzahl anfraktionen, werden diese aktuell NICHT korrekt erkannt!
+        collfract = list(set(collfract))
+        if len(collfract) > 1:
+            self.log.info("Different numbers of fractions found!")
+            self.fractions = sum([int(x) for x in collfract])
+        elif len(collfract) == 1:
+            self.fractions = collfract[0]
+        else:
+            self.debug.critical("No fraction information found!")
+            self.log.critical("No fraction information found!")
+            raise ValueError('Check Data!')
+        self.log.info("Detected fractions: " + str(self.fractions))
 
         ## check if any dose data was found
         if len(tmsS) == 0:
